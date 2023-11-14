@@ -1,7 +1,7 @@
 import { NativeModules, Platform } from "react-native";
 
 const LINKING_ERROR =
-  `The package 'react-native-awesome-library' doesn't seem to be linked. Make sure: \n\n` +
+  `The package '/savanitdev-react-native-printer-xprinter' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
   "- You rebuilt the app after installing the package\n" +
   "- You are not using Expo Go\n";
@@ -32,6 +32,6 @@ export function printText() {
 export function printImg(base64: string, contrast: number, brightness: number) {
   return AwesomeLibrary.printImg(base64, contrast, brightness);
 }
-export function disConnectNet() {
+export function disConnect() {
   return AwesomeLibrary.disConnectNet();
 }
