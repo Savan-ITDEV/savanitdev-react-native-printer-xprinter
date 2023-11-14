@@ -23,6 +23,13 @@ export function multiply(a: number, b: number): Promise<number> {
 export function onCreate() {
   return AwesomeLibrary.onCreate();
 }
+export function connectBt(macAddress: string) {
+  try {
+    return AwesomeLibrary.connectBt(macAddress);
+  } catch (error) {
+    console.log("please check your bluetooth!");
+  }
+}
 export function connectNet(ip: string) {
   return AwesomeLibrary.connectNet(ip);
 }

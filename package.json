@@ -22,5 +22,8 @@
         "preset": "angular"
       }
     }
+  },
+  "dependencies": {
+    "react-native-ble-manager": "^10.1.5"
   }
 }
