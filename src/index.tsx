@@ -177,7 +177,7 @@ export const BLUETOOTH_SCAN = ({ styles, children, update }) => {
     setPeripherals((prevArray) => {
       // Find the index of the object with the specified key
       const indexOfObjectToUpdate = prevArray.findIndex(
-        (obj) => obj.key === key
+        (obj: { key: any }) => obj.key === key
       );
 
       if (indexOfObjectToUpdate !== -1) {
@@ -282,110 +282,6 @@ export const BLUETOOTH_SCAN = ({ styles, children, update }) => {
       <TouchableOpacity style={{ ...styles }} onPress={startScan}>
         {children}
       </TouchableOpacity>
-      {peripherals.map((i: { value: any }, k: any) => {
-        const item = i.value;
-
-        return (
-          <View key={k} style={[styles.row]}>
-            <Text style={styles.peripheralName}>
-              {/* completeLocalName (item.name) & shortAdvertisingName (advertising.localName) may not always be the same */}
-              {item.name} - {item?.advertising?.localName}
-              {item.connecting && " - Connecting..."}
-            </Text>
-            <Text style={styles.rssi}>RSSI: {item.rssi}</Text>
-            <Text style={styles.peripheralId}>{item.id}</Text>
-          </View>
-        );
-      })}
     </View>
   );
 };
-
-const boxShadow = {
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-  elevation: 5,
-};
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-
-    alignItems: "center",
-  },
-  engine: {
-    position: "absolute",
-    right: 10,
-    bottom: 0,
-  },
-  scanButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    backgroundColor: "#0a398a",
-    margin: 10,
-    borderRadius: 12,
-    ...boxShadow,
-  },
-  scanButtonText: {
-    fontSize: 20,
-    letterSpacing: 0.25,
-  },
-  body: {
-    backgroundColor: "#0082FC",
-    flex: 1,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: "400",
-  },
-  highlight: {
-    fontWeight: "700",
-  },
-  footer: {
-    fontSize: 12,
-    fontWeight: "600",
-    padding: 4,
-    paddingRight: 12,
-    textAlign: "right",
-  },
-  peripheralName: {
-    fontSize: 16,
-    textAlign: "center",
-    padding: 10,
-  },
-  rssi: {
-    fontSize: 12,
-    textAlign: "center",
-    padding: 2,
-  },
-  peripheralId: {
-    fontSize: 12,
-    textAlign: "center",
-    padding: 2,
-    paddingBottom: 20,
-  },
-  row: {
-    marginLeft: 10,
-    marginRight: 10,
-    borderRadius: 20,
-    ...boxShadow,
-  },
-  noPeripherals: {
-    margin: 10,
-    textAlign: "center",
-  },
-});
