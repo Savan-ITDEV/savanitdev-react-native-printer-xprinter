@@ -1,11 +1,13 @@
 package com.awesomelibrary;
 import static android.content.Context.BIND_AUTO_CREATE;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
