@@ -58,8 +58,8 @@ export function connectBt(macAddress: string) {
     console.log("please check your bluetooth!");
   }
 }
-export function connectNet(ip: string) {
-  return AwesomeLibrary.connectNet(ip);
+export function connectNet(ip: string, img: string) {
+  return AwesomeLibrary.connectNet(ip, img, 576, 576);
 }
 export function printText() {
   return AwesomeLibrary.printText();
