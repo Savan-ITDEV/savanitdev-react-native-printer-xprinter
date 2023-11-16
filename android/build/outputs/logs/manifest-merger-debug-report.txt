@@ -1,11 +1,11 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-2:12
-INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-2:12
-INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-2:12
+ADDED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-3:12
+INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-3:12
+INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-3:12
 	package
 		INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml
-		ADDED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-2:12
+		ADDED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:1-3:12
 		INJECTED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml
 	xmlns:android
 		ADDED from /Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library/android/src/main/AndroidManifestNew.xml:1:11-69

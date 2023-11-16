@@ -13,9 +13,9 @@ import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import java.util.ArrayList;
-import java.util.List;
+import com.facebook.react.module.annotations.ReactModule;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.TaskCallback;
@@ -24,25 +24,28 @@ import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
 public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
-    public static final String NAME = "AwesomeLibrary";
-    public static IMyBinder myBinder;
-    public static boolean ISCONNECT=false;
-    Context context;
-    public AwesomeLibraryModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        context = reactContext ;
-    }
+  public static final String NAME = "AwesomeLibrary";
+  public static IMyBinder myBinder;
+  public static boolean ISCONNECT=false;
+ Context context;
+  public AwesomeLibraryModule(ReactApplicationContext reactContext) {
+    super(reactContext);
+    context = reactContext ;
+  }
 
-    @Override
-    @NonNull
-    public String getName() {
-        return NAME;
-    }
+  @Override
+  @NonNull
+  public String getName() {
+    return NAME;
+  }
 
-    ServiceConnection mSerconnection= new ServiceConnection() {
+  ServiceConnection mSerconnection= new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             myBinder= (IMyBinder) service;
@@ -53,8 +56,8 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.e("myBinder","disConnectNet");
-            Toast toast = Toast.makeText(context, "disConnectNet", Toast.LENGTH_SHORT);
+            Log.e("myBinder","disconnect");
+            Toast toast = Toast.makeText(context, "disconnect", Toast.LENGTH_SHORT);
             toast.show();
         }
     };
@@ -68,16 +71,16 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 //        Log.e("App Notify", "init Done!");
 //        super.onStart();
 
-        Intent intent =new Intent(context, PosprinterService.class);
-        context.bindService(intent,mSerconnection,BIND_AUTO_CREATE);
+      Intent intent =new Intent(context, PosprinterService.class);
+      context.bindService(intent,mSerconnection,BIND_AUTO_CREATE);
     }
 
-    public static Bitmap decodeBase64ToBitmap(String base64String) {
+      public static Bitmap decodeBase64ToBitmap(String base64String) {
         byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
-    @ReactMethod
-    private void disConnectNet(){
+  @ReactMethod
+    private void disConnect3(){
         if (ISCONNECT){
             myBinder.DisconnectCurrentPort(new TaskCallback() {
                 @Override
@@ -96,7 +99,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    private void connectNet(String ip,String base64,int w1,int w2){
+    private void connectNet3(String ip,String base64,int w1,int w2){
 
         if (ip!=null){
             if (ISCONNECT) {
@@ -107,7 +110,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
                     @Override
                     public void OnFailed() {
-                        disConnectNet();
+                        disConnect3();
                     }
                 });
             } else {
@@ -123,7 +126,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                     public void OnFailed() {
                         ISCONNECT = false;
                         Log.e("App Notify connectNet3", "connect OnFailed" );
-                        disConnectNet();
+                        disConnect3();
                     }
                 });
             }
@@ -139,16 +142,16 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 (decodeBase64ToBitmap(base64String),w1);
 
         if (ISCONNECT){
-            myBinder.WriteSendData(new TaskCallback() {
+           myBinder.WriteSendData(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-                    disConnectNet();
+                    disConnect3();
 
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnectNet();
+                    disConnect3();
                 }
             }, new ProcessData() {
                 @Override
@@ -156,14 +159,14 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                     List<byte[]> list = new ArrayList<>();
                     list.add(DataForSendToPrinterPos80.initializePrinter());
 
-                    list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Center,w2));
+                        list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
 
                     list.add(DataForSendToPrinterPos80.printAndFeedLine());
                     return list;
                 }
             });
         }else {
-            disConnectNet();
+            disConnect3();
         }
     }
 
