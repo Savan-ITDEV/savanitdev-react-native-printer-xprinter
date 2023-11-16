@@ -45,28 +45,20 @@ const AwesomeLibrary = NativeModules.AwesomeLibrary
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return AwesomeLibrary.multiply(a, b);
-}
 export function onCreate() {
   return AwesomeLibrary.onCreate();
 }
-export function connectBt(macAddress: string) {
-  try {
-    return AwesomeLibrary.connectBt(macAddress);
-  } catch (error) {
-    console.log("please check your bluetooth!");
-  }
-}
+// export function connectBt(macAddress: string) {
+//   try {
+//     return AwesomeLibrary.connectBt(macAddress);
+//   } catch (error) {
+//     console.log("please check your bluetooth!");
+//   }
+// }
 export function connectNet(ip: string, img: string) {
   return AwesomeLibrary.connectNet(ip, img, 576, 576);
 }
-export function printText() {
-  return AwesomeLibrary.printText();
-}
-export function printImg(base64: string, contrast: number, brightness: number) {
-  return AwesomeLibrary.printImg(base64, contrast, brightness);
-}
+
 export function disConnect() {
   return AwesomeLibrary.disConnectNet();
 }
