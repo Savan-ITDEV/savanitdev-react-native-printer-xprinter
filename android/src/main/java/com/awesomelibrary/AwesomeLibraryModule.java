@@ -21,6 +21,8 @@ import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.TaskCallback;
 import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapProcess;
+import net.posprinter.utils.BitmapToByteData;
+import net.posprinter.utils.DataForSendToPrinterPos80;
 
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
