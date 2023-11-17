@@ -17,11 +17,17 @@ const AwesomeLibrary = NativeModules.AwesomeLibrary
       }
     );
 
+export function pingPinter(ip: string): Promise<boolean> {
+  return AwesomeLibrary.pingPinter(ip);
+}
 export function onCreate() {
   return AwesomeLibrary.onCreate();
 }
-export function connectNet3(ip: string, img: string) {
-  return AwesomeLibrary.connectNet3(ip, img, 576, 576);
+export function connectNet(ip: string) {
+  return AwesomeLibrary.connectNet(ip);
+}
+export function printBitmap(img: string, w1: number, w2: number) {
+  return AwesomeLibrary.printBitmap(img, w1, w2);
 }
 export function disConnectNet() {
   return AwesomeLibrary.disConnectNet();

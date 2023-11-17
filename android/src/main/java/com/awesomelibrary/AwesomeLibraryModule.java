@@ -11,11 +11,12 @@ import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
+import com.facebook.react.bridge.Promise;
 import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.module.annotations.ReactModule;
+import java.util.ArrayList;
+import java.util.List;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.TaskCallback;
@@ -23,9 +24,6 @@ import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
@@ -80,7 +78,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
   @ReactMethod
-    private void disConnect3(){
+    private void disConnectNet(){
         if (ISCONNECT){
             myBinder.DisconnectCurrentPort(new TaskCallback() {
                 @Override
@@ -99,7 +97,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    private void connectNet3(String ip,String base64,int w1,int w2){
+    private void connectNet(String ip){
 
         if (ip!=null){
             if (ISCONNECT) {
@@ -110,7 +108,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
                     @Override
                     public void OnFailed() {
-                        disConnect3();
+                        disConnectNet();
                     }
                 });
             } else {
@@ -118,24 +116,51 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                     @Override
                     public void OnSucceed() {
                         ISCONNECT = true;
-                        printBitmap(base64,w1,w2);
-                        Log.e("App Notify connectNet3", "connect OnSucceed" );
+
+                        Log.e("App Notify connectNet", "connect OnSucceed" );
                     }
 
                     @Override
                     public void OnFailed() {
                         ISCONNECT = false;
-                        Log.e("App Notify connectNet3", "connect OnFailed" );
-                        disConnect3();
+                        Log.e("App Notify connectNet", "connect OnFailed" );
+                        disConnectNet();
                     }
                 });
             }
 
         }else {
-            Log.e("App Notify connectNet3", "connect OnFailed 2" );
+            Log.e("App Notify connectNet", "connect OnFailed 2" );
         }
     }
 
+    @ReactMethod
+    private void pingPinter(String ip,Promise promise){
+
+        if (ip!=null){
+            myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                @Override
+                public void OnSucceed() {
+
+                    promise.resolve(ip);
+                    Log.e("App Notify connectNet", "connect OnSucceed" );
+                }
+
+                @Override
+                public void OnFailed() {
+                    promise.reject("","OnFailed connect");
+                    Log.e("App Notify connectNet", "connect OnFailed" );
+
+                }
+            });
+
+
+        }else {
+            promise.reject("","OnFailed connect");
+            Log.e("App Notify connectNet", "connect OnFailed" );
+        }
+    }
+    @ReactMethod
     private void printBitmap(String base64String,int w1,int w2){
 //        final Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.test);
         final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
@@ -145,13 +170,13 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
            myBinder.WriteSendData(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-                    disConnect3();
+                    disConnectNet();
 
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnect3();
+                    disConnectNet();
                 }
             }, new ProcessData() {
                 @Override
@@ -166,7 +191,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 }
             });
         }else {
-            disConnect3();
+            disConnectNet();
         }
     }
 
