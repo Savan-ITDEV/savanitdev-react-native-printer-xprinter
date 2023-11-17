@@ -5,9 +5,5 @@
   "main": "src/index",
   "author": " <> ()",
   "license": "UNLICENSED",
-  "homepage": "#readme",
-  "files": [
-    "build",
-    "app.plugin.js"
-  ]
+  "homepage": "#readme"
 }
