@@ -11,12 +11,12 @@ import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
-import com.facebook.react.bridge.Promise;
 import androidx.annotation.NonNull;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import java.util.ArrayList;
-import java.util.List;
+import com.facebook.react.module.annotations.ReactModule;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.TaskCallback;
@@ -24,6 +24,9 @@ import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
