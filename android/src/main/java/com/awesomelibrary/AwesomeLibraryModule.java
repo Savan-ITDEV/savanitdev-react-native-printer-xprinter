@@ -146,6 +146,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 myBinder.DisconnectCurrentPort(new TaskCallback() {
                     @Override
                     public void OnSucceed() {
+
                     }
 
                     @Override
@@ -172,6 +173,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
             }
 
         }else {
+            disConnectNet();
             Log.e("App Notify connectNet", "connect OnFailed 2" );
         }
     }
@@ -183,13 +185,14 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
             myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-
+                    disConnectNet();
                     promise.resolve(ip);
                     Log.e("App Notify connectNet", "connect OnSucceed" );
                 }
 
                 @Override
                 public void OnFailed() {
+                    disConnectNet();
                     promise.reject("","OnFailed connect");
                     Log.e("App Notify connectNet", "connect OnFailed" );
 
