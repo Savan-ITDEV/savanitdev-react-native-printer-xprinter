@@ -137,6 +137,45 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         }
     }
 
+
+    @ReactMethod
+    private void connectNetImg(String ip,String base64String,int w1,int w2){
+
+        if (ip!=null){
+            if (ISCONNECT) {
+                myBinder.DisconnectCurrentPort(new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                        disConnectNet();
+                    }
+                });
+            } else {
+                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                        ISCONNECT = true;
+
+                        Log.e("App Notify connectNet", "connect OnSucceed" );
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                        ISCONNECT = false;
+                        Log.e("App Notify connectNet", "connect OnFailed" );
+                        disConnectNet();
+                    }
+                });
+            }
+
+        }else {
+            Log.e("App Notify connectNet", "connect OnFailed 2" );
+        }
+    }
+
     @ReactMethod
     private void pingPinter(String ip,Promise promise){
 
@@ -165,7 +204,6 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     }
     @ReactMethod
     private void printBitmap(String base64String,int w1,int w2){
-//        final Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.test);
         final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
                 (decodeBase64ToBitmap(base64String),w1);
 
@@ -174,6 +212,36 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 @Override
                 public void OnSucceed() {
                     disConnectNet();
+                }
+
+                @Override
+                public void OnFailed() {
+                    disConnectNet();
+                }
+            }, new ProcessData() {
+                @Override
+                public List<byte[]> processDataBeforeSend() {
+                    List<byte[]> list = new ArrayList<>();
+                    list.add(DataForSendToPrinterPos80.initializePrinter());
+                        list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
+                    list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                    list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
+                    return list;
+                }
+            });
+        }else {
+            disConnectNet();
+        }
+    }
+    @ReactMethod
+    private void printImg(String base64String,int w1,int w2){
+        final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
+                (decodeBase64ToBitmap(base64String),w1);
+
+        if (ISCONNECT){
+            myBinder.WriteSendData(new TaskCallback() {
+                @Override
+                public void OnSucceed() {
 
                 }
 
@@ -187,9 +255,10 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                     List<byte[]> list = new ArrayList<>();
                     list.add(DataForSendToPrinterPos80.initializePrinter());
 
-                        list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
+                    list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
 
                     list.add(DataForSendToPrinterPos80.printAndFeedLine());
+                    list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
                     return list;
                 }
             });
