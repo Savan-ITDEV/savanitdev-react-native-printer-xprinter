@@ -158,7 +158,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                     @Override
                     public void OnSucceed() {
                         ISCONNECT = true;
-
+                        printBitmap(base64String,w1,w2);
                         Log.e("App Notify connectNet", "connect OnSucceed" );
                     }
 

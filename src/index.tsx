@@ -26,6 +26,9 @@ export function onCreate() {
 export function connectNet(ip: string) {
   return AwesomeLibrary.connectNet(ip);
 }
+export function connectNetImg(ip: string, img: string, w1: number, w2: number) {
+  return AwesomeLibrary.connectNetImg(ip, img, w1, w2);
+}
 export function printBitmap(img: string, w1: number, w2: number) {
   return AwesomeLibrary.printBitmap(img, w1, w2);
 }
