@@ -24,6 +24,7 @@ import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapProcess;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
+import net.posprinter.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
             Log.e("myBinder","connect");
             Toast toast = Toast.makeText(context, "connect", Toast.LENGTH_SHORT);
             toast.show();
+           
         }
 
         @Override
@@ -67,8 +69,8 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void onCreate() {
-        Toast toast = Toast.makeText(context, "init Done!", Toast.LENGTH_SHORT);
-        toast.show();
+        // Toast toast = Toast.makeText(context, "init Done!", Toast.LENGTH_SHORT);
+        // toast.show();
 //        Log.e("App Notify", "init Done!");
 //        super.onStart();
 
@@ -82,7 +84,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     }
   @ReactMethod
     private void disConnectNet(){
-        if (ISCONNECT){
+     if (ISCONNECT){
             myBinder.DisconnectCurrentPort(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
@@ -97,116 +99,98 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 }
             });
         }
+        
     }
-
-    @ReactMethod
-    private void connectNet(String ip){
-
-        if (ip!=null){
-            if (ISCONNECT) {
-                myBinder.DisconnectCurrentPort(new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                        disConnectNet();
-                    }
-                });
-            } else {
-                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-                        ISCONNECT = true;
-
-                        Log.e("App Notify connectNet", "connect OnSucceed" );
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                        ISCONNECT = false;
-                        Log.e("App Notify connectNet", "connect OnFailed" );
-                        disConnectNet();
-                    }
-                });
-            }
-
-        }else {
-            Log.e("App Notify connectNet", "connect OnFailed 2" );
-        }
-    }
-
-
-    @ReactMethod
-    private void connectNetImg(String ip,String base64String,int w1,int w2){
-
-        if (ip!=null){
-            if (ISCONNECT) {
-                myBinder.DisconnectCurrentPort(new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                        disConnectNet();
-                    }
-                });
-            } else {
-                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-                        ISCONNECT = true;
-                        printBitmap(base64String,w1,w2);
-                        Log.e("App Notify connectNet", "connect OnSucceed" );
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                        ISCONNECT = false;
-                        Log.e("App Notify connectNet", "connect OnFailed" );
-                        disConnectNet();
-                    }
-                });
-            }
-
-        }else {
-            disConnectNet();
-            Log.e("App Notify connectNet", "connect OnFailed 2" );
-        }
-    }
-
-    @ReactMethod
-    private void pingPinter(String ip,Promise promise){
-
-        if (ip!=null){
-            myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+   @ReactMethod
+    private void disconnetNetPort(){
+        if (ISCONNECT){
+            myBinder.DisconnetNetPort(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-                    disConnectNet();
-                    promise.resolve(ip);
-                    Log.e("App Notify connectNet", "connect OnSucceed" );
+                    ISCONNECT = false;
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnectNet();
-                    promise.reject("","OnFailed connect");
-                    Log.e("App Notify connectNet", "connect OnFailed" );
-
+                   ISCONNECT = true;
                 }
             });
+           
+        }
 
+        
+    }
+
+    @ReactMethod
+    private void connectNet(String ip,Promise promise){
+       
+        if (ip!=null){
+            if (ISCONNECT) {
+                myBinder.DisconnectCurrentPort(new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                      
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                    
+                    }
+                });
+            } else {
+                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                        ISCONNECT = true;
+                        promise.resolve(Boolean.toString(ISCONNECT));
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                        ISCONNECT = false;
+                         promise.reject(Boolean.toString(ISCONNECT));
+                      
+                    }
+                });
+            }
 
         }else {
-            promise.reject("","OnFailed connect");
-            Log.e("App Notify connectNet", "connect OnFailed" );
+           
         }
     }
+
+
     @ReactMethod
-    private void printBitmap(String base64String,int w1,int w2){
+    private void connectNetImg(String ip,String base64String,int w1,int w2,Promise promise){
+
+     if (ip!=null){
+            if (ISCONNECT) {
+              disConnectNet();
+            } else {
+                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                        ISCONNECT = true;
+                        printBitmap(base64String,w1,w2,promise);
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                        ISCONNECT = false;
+                        promise.reject("","connectNetImg error");
+                      disConnectNet();
+                    }
+                });
+            }
+
+        }else {
+            
+        }
+
+        
+    }
+   @ReactMethod
+    private void printBitmap(String base64String,int w1,int w2,Promise promise){
         final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
                 (decodeBase64ToBitmap(base64String),w1);
 
@@ -214,30 +198,68 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
            myBinder.WriteSendData(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-                    disConnectNet();
+                     promise.resolve("1");
+                     disConnectNet();
+                   
+                   
+                   
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnectNet();
+                    promise.reject("","printer error");
+                   
+                     disConnectNet();
+                   
                 }
             }, new ProcessData() {
                 @Override
                 public List<byte[]> processDataBeforeSend() {
                     List<byte[]> list = new ArrayList<>();
                     list.add(DataForSendToPrinterPos80.initializePrinter());
-                        list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
+                    // list.add(StringUtils.strTobytes("1234567890qwertyuiopakjbdscm nkjdv mcdskjb"));
+                     list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
                     list.add(DataForSendToPrinterPos80.printAndFeedLine());
                     list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
                     return list;
                 }
             });
         }else {
-            disConnectNet();
+              promise.reject("","printer error");
+                     disConnectNet();
+                    
         }
     }
     @ReactMethod
-    private void printImg(String base64String,int w1,int w2){
+    private void pingPinter(String ip,Promise promise){
+
+        if (ip!=null){
+            myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                @Override
+                public void OnSucceed() {
+                      disConnectNet();
+                    promise.resolve(ip);
+                    Log.e("App Notify connectNet", "connect OnSucceed" );
+                }
+
+                @Override
+                public void OnFailed() {
+                    disConnectNet();
+                    promise.reject("","OnFailed connect der");
+                    Log.e("App Notify connectNet", "connect OnFailed" );
+
+                }
+            });
+
+
+        }else {
+            promise.reject("","OnFailed connect der 2 ");
+            Log.e("App Notify connectNet", "connect OnFailed" );
+        }
+    }
+ 
+    @ReactMethod
+    private void printImg(String base64String,int w1,int w2,Promise promise){
         final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
                 (decodeBase64ToBitmap(base64String),w1);
 
@@ -245,28 +267,27 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
             myBinder.WriteSendData(new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-
+                   promise.resolve("1");
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnectNet();
+                    promise.reject("0","OnFailed printImg");
+                    // disConnectNet(promise);
                 }
             }, new ProcessData() {
                 @Override
                 public List<byte[]> processDataBeforeSend() {
                     List<byte[]> list = new ArrayList<>();
                     list.add(DataForSendToPrinterPos80.initializePrinter());
-
                     list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
-
                     list.add(DataForSendToPrinterPos80.printAndFeedLine());
-                    list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
+                     list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
                     return list;
                 }
             });
         }else {
-            disConnectNet();
+             promise.reject("0","OnFailed printImg");
         }
     }
 

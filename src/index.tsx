@@ -23,8 +23,15 @@ export function pingPinter(ip: string): Promise<boolean> {
 export function onCreate() {
   return AwesomeLibrary.onCreate();
 }
-export function connectNet(ip: string) {
+export function connectNet(ip: string): Promise<boolean> {
   return AwesomeLibrary.connectNet(ip);
+}
+export function printImg(
+  img: string,
+  w1: number,
+  w2: number
+): Promise<boolean> {
+  return AwesomeLibrary.printImg(img, w1, w2);
 }
 export function connectNetImg(ip: string, img: string, w1: number, w2: number) {
   return AwesomeLibrary.connectNetImg(ip, img, w1, w2);
@@ -32,6 +39,6 @@ export function connectNetImg(ip: string, img: string, w1: number, w2: number) {
 export function printBitmap(img: string, w1: number, w2: number) {
   return AwesomeLibrary.printBitmap(img, w1, w2);
 }
-export function disConnectNet() {
+export function disConnectNet(): Promise<boolean> {
   return AwesomeLibrary.disConnectNet();
 }
