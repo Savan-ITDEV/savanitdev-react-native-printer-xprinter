@@ -26,12 +26,14 @@ import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 import net.posprinter.utils.StringUtils;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
 public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
+  List<byte[]> setPrinter = new ArrayList<>();
   public static final String NAME = "AwesomeLibrary";
   public static IMyBinder myBinder;
   public static boolean ISCONNECT=false;
@@ -69,11 +71,6 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void onCreate() {
-        // Toast toast = Toast.makeText(context, "init Done!", Toast.LENGTH_SHORT);
-        // toast.show();
-//        Log.e("App Notify", "init Done!");
-//        super.onStart();
-
       Intent intent =new Intent(context, PosprinterService.class);
       context.bindService(intent,mSerconnection,BIND_AUTO_CREATE);
     }
@@ -89,35 +86,16 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 @Override
                 public void OnSucceed() {
                     ISCONNECT = false;
-
+                    
                 }
 
                 @Override
                 public void OnFailed() {
                     ISCONNECT = true;
-
+                    
                 }
             });
         }
-        
-    }
-   @ReactMethod
-    private void disconnetNetPort(){
-        if (ISCONNECT){
-            myBinder.DisconnetNetPort(new TaskCallback() {
-                @Override
-                public void OnSucceed() {
-                    ISCONNECT = false;
-                }
-
-                @Override
-                public void OnFailed() {
-                   ISCONNECT = true;
-                }
-            });
-           
-        }
-
         
     }
 
@@ -129,12 +107,14 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 myBinder.DisconnectCurrentPort(new TaskCallback() {
                     @Override
                     public void OnSucceed() {
-                      
+                      ISCONNECT = false;
+                      promise.resolve(Boolean.toString(ISCONNECT));
                     }
 
                     @Override
                     public void OnFailed() {
-                    
+                     ISCONNECT = true;
+                     promise.reject(Boolean.toString(ISCONNECT));
                     }
                 });
             } else {
@@ -163,21 +143,34 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     @ReactMethod
     private void connectNetImg(String ip,String base64String,int w1,int w2,Promise promise){
 
-     if (ip!=null){
+       if (ip!=null){
             if (ISCONNECT) {
-              disConnectNet();
+                myBinder.DisconnectCurrentPort(new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                     
+                      
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                       
+                     
+                    }
+                });
             } else {
                 myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
                     @Override
                     public void OnSucceed() {
                         ISCONNECT = true;
-                        printBitmap(base64String,w1,w2,promise);
+                     
+                          printBitmap(base64String,w1,w2,promise);
                     }
 
                     @Override
                     public void OnFailed() {
                         ISCONNECT = false;
-                        promise.reject("","connectNetImg error");
+                       
                       disConnectNet();
                     }
                 });
@@ -199,7 +192,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 @Override
                 public void OnSucceed() {
                      promise.resolve("1");
-                     disConnectNet();
+                      disConnectNet();
                    
                    
                    
@@ -207,9 +200,9 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
 
                 @Override
                 public void OnFailed() {
-                    promise.reject("","printer error");
+                   promise.reject("","OnFailed print img");
                    
-                     disConnectNet();
+                      disConnectNet();
                    
                 }
             }, new ProcessData() {
@@ -217,16 +210,15 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 public List<byte[]> processDataBeforeSend() {
                     List<byte[]> list = new ArrayList<>();
                     list.add(DataForSendToPrinterPos80.initializePrinter());
-                    // list.add(StringUtils.strTobytes("1234567890qwertyuiopakjbdscm nkjdv mcdskjb"));
-                     list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
+                    list.add(DataForSendToPrinterPos80.printRasterBmp(0,bitmap1, BitmapToByteData.BmpType.Dithering, BitmapToByteData.AlignType.Right,w2));
                     list.add(DataForSendToPrinterPos80.printAndFeedLine());
                     list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
                     return list;
                 }
             });
         }else {
-              promise.reject("","printer error");
-                     disConnectNet();
+           promise.reject("","OnFailed print img");
+                      disConnectNet();
                     
         }
     }
@@ -237,14 +229,14 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
             myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
                 @Override
                 public void OnSucceed() {
-                      disConnectNet();
+                    //   disConnectNet();
                     promise.resolve(ip);
                     Log.e("App Notify connectNet", "connect OnSucceed" );
                 }
 
                 @Override
                 public void OnFailed() {
-                    disConnectNet();
+                    //   disConnectNet();
                     promise.reject("","OnFailed connect der");
                     Log.e("App Notify connectNet", "connect OnFailed" );
 
@@ -287,8 +279,305 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 }
             });
         }else {
-             promise.reject("0","OnFailed printImg");
+            // disConnectNet(promise);
         }
     }
+
+    
+    @ReactMethod
+    private void printText(Promise promise){
+        if (ISCONNECT){
+            myBinder.WriteSendData(new TaskCallback() {
+                @Override
+                public void OnSucceed() {
+                  
+                    disConnectNet();
+                    promise.resolve("Done");
+                }
+
+                @Override
+                public void OnFailed() {
+                   
+                    promise.reject("error","printText fail!");
+                    disConnectNet();
+
+                }
+            }, new ProcessData() {
+                @Override
+                public List<byte[]> processDataBeforeSend() {
+                    return setPrinter;
+                }
+            });
+        }else {
+            disConnectNet();
+        }
+    }
+
+   @ReactMethod
+    public void clearPaper(Promise promise){
+       setPrinter.clear();
+       if(setPrinter.size() ==0){
+           promise.resolve("0");
+       }
+    }
+    @ReactMethod
+    public void initializeText(){
+        setPrinter.add(DataForSendToPrinterPos80.initializePrinter());
+    }
+    @ReactMethod
+    public void cut(){
+        setPrinter.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(0x42,0x66));
+    }
+    @ReactMethod
+    public void printAndFeedLine(){
+        setPrinter.add(DataForSendToPrinterPos80.printAndFeedLine());
+    }
+
+    @ReactMethod
+    public void CancelChineseCharModel(){
+       setPrinter.add(DataForSendToPrinterPos80.CancelChineseCharModel());
+    }
+
+    @ReactMethod
+    public void selectAlignment(int n){
+        // type : 0 = left , 1 = : center , right : 2
+       setPrinter.add(DataForSendToPrinterPos80.selectAlignment(n));
+    }
+    @ReactMethod
+    public void text(String text,String charset){
+       setPrinter.add(StringUtils.strTobytes(text,charset));
+    }
+    @ReactMethod
+    public void selectCharacterSize(int n){
+       setPrinter.add(DataForSendToPrinterPos80.selectCharacterSize(n));
+    }
+
+    @ReactMethod
+    public void selectOrCancelBoldModel(int n){
+       setPrinter.add(DataForSendToPrinterPos80.selectOrCancelBoldModel(n));
+    }
+
+    @ReactMethod
+    public void selectCharacterCodePage(int n){
+       setPrinter.add(DataForSendToPrinterPos80.selectCharacterCodePage(n));
+    }
+
+    @ReactMethod
+    public void selectInternationalCharacterSets(int n){
+       setPrinter.add(DataForSendToPrinterPos80.selectInternationalCharacterSets(n));
+    }
+
+    @ReactMethod
+    public void setAbsolutePrintPosition(int n,int m){
+       setPrinter.add(DataForSendToPrinterPos80.setAbsolutePrintPosition(n,m) );
+    }
+
+
+    // @ReactMethod
+    // private byte[] GetPrinterName(){
+    //     return DataForSendToPrinterPos80.GetPrinterName();
+    // }
+    // @ReactMethod
+    // private byte[] GetManufacturer(){
+    //     return DataForSendToPrinterPos80.GetManufacturer();
+    // }
+    // @ReactMethod
+    // private byte[] GetFirmwareVersion(){
+    //     return DataForSendToPrinterPos80.GetFirmwareVersion();
+    // }
+    // @ReactMethod
+    // private byte[] GetSerialNumber(){
+    //     return DataForSendToPrinterPos80.GetSerialNumber();
+    // }
+    // @ReactMethod
+    // private byte[] selectChineseCharModel(){
+    //     return DataForSendToPrinterPos80.selectChineseCharModel();
+    // }
+    // @ReactMethod
+    // private byte[] selectPageModel(){
+    //     return DataForSendToPrinterPos80.selectPageModel();
+    // }
+    // @ReactMethod
+    // private byte[] avoidLostOrder(){
+    //     return DataForSendToPrinterPos80.avoidLostOrder();
+    // }
+    // @ReactMethod
+    // private byte[] selectStandardModel(){
+    //     return DataForSendToPrinterPos80.selectStandardModel();
+    // }
+    // @ReactMethod
+    // private byte[] setDefaultLineSpacing(){
+    //     return DataForSendToPrinterPos80.setDefultLineSpacing();
+    // }
+   
+   
+  
+    // @ReactMethod
+    // private byte[] selectOrCancelChineseCharUnderLineModel(int n){
+    //     return DataForSendToPrinterPos80.selectOrCancelChineseCharUnderLineModel(n);
+    // }
+    // @ReactMethod
+    // private byte[] selectHRIFont(int n){
+    //     return DataForSendToPrinterPos80.selectHRIFont(n);
+    // }
+    // @ReactMethod
+    // private byte[] selectPrintDirectionUnderPageModel(int n){
+    //     return DataForSendToPrinterPos80.selectPrintDirectionUnderPageModel(n);
+    // }
+    // @ReactMethod
+    // private byte[] setBarcodeWidth(int n){
+    //     return DataForSendToPrinterPos80.setBarcodeWidth(n);
+    // }
+    // @ReactMethod
+    // private byte[] setBarcodeHeight(int n){
+    //     return DataForSendToPrinterPos80.setBarcodeHeight(n);
+    // }
+    // @ReactMethod
+    // private byte[] getPrinterStatus(int port){
+    //     return DataForSendToPrinterPos80.getPrinterStatus(port);
+    // }
+
+    // @ReactMethod
+    // private byte[] openOrCloseAutoReturnPrintState(int n){
+    //     return DataForSendToPrinterPos80.openOrCloseAutoReturnPrintState(n);
+    // }
+    // @ReactMethod
+    // private byte[] selectPrintTransducerOutPutPageOutSignal(int n){
+    //     return DataForSendToPrinterPos80.selectPrintTransducerOutPutPageOutSignal(n);
+    // }
+    // @ReactMethod
+    // private byte[] printBmpInFLASH(int n, int m){
+    //     return DataForSendToPrinterPos80.printBmpInFLASH(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] definedUserDefinedChineseChar(int n, byte[] b){
+    //     return DataForSendToPrinterPos80.definedUserDefinedChineseChar(n,b);
+    // }
+    // @ReactMethod
+    // private byte[] setAbsolutePositionUnderPageModel(int n, int m){
+    //     return DataForSendToPrinterPos80.setAbsolutePositionUnderPageModel(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] setChineseCharLeftAndRightSpace(int n, int m){
+    //     return DataForSendToPrinterPos80.setChineseCharLeftAndRightSpace(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] setLeftSpace(int n, int m){
+    //     return DataForSendToPrinterPos80.setLeftSpace(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] setPrintAreaWidth(int n, int m){
+    //     return DataForSendToPrinterPos80.setPrintAreaWidth(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] setVerticalRelativePositionUnderPageModel(int n, int m){
+    //     return DataForSendToPrinterPos80.setVerticalRelativePositionUnderPageModel(n,m);
+    // }
+    // @ReactMethod
+    // private byte[] executeMacroCommand(int r, int t, int m){
+    //     return DataForSendToPrinterPos80.executeMacrodeCommand(r,t,m);
+    // }
+    // @ReactMethod
+    // private byte[] setHorizontalAndVerticalMoveUnit(int x, int y){
+    //     return DataForSendToPrinterPos80.setHorizontalAndVerticalMoveUnit(x,y);
+    // }
+    // @ReactMethod
+    // private byte[] selectOrCancelConvertPrintModel(int n){
+    //     return DataForSendToPrinterPos80.selectOrCancelConvertPrintModel(n);
+    // }
+    // @ReactMethod
+    // private byte[] allowOrForbidPressButton(int n){
+    //     return DataForSendToPrinterPos80.allowOrForbidPressButton(n);
+    // }
+ 
+    // @ReactMethod
+    // private byte[] printAndFeedForward(int n){
+    //     return DataForSendToPrinterPos80.printAndFeedForward(n);
+    // }
+    // @ReactMethod
+    // private byte[] selectPrintTransducerStopPrint(int n){
+    //     return DataForSendToPrinterPos80.selectPrintTransducerStopPrint(n);
+    // }
+    // @ReactMethod
+    // private byte[] setRelativeHorizontalPrintPosition(int nL, int nH){
+    //     return DataForSendToPrinterPos80.setRelativeHorizontalPrintPosition(nL,nH);
+    // }
+    // @ReactMethod
+    // private byte[] createCashboxControlPulse(int m, int t1, int t2){
+    //     return DataForSendToPrinterPos80.creatCashboxContorlPulse(m,t1,t2);
+    // }
+    // @ReactMethod
+    // private byte[] selectFont(int n){
+    //     return DataForSendToPrinterPos80.selectFont(n);
+    // }
+    // @ReactMethod
+    // private byte[] setChineseCharacterModel(int n){
+    //     return DataForSendToPrinterPos80.setChineseCharacterModel(n);
+    // }
+    // @ReactMethod
+    // private byte[] setLineSpacing(int n){
+    //     return DataForSendToPrinterPos80.setLineSpaceing(n);
+    // }
+    // @ReactMethod
+    // private byte[] selectOrCancelDoublePrintModel(int n){
+    //     return DataForSendToPrinterPos80.selectOrCancelDoubelPrintModel(n);
+    // }
+    
+    // @ReactMethod
+    // private byte[] cancelUserDefinedCharacters(int n){
+    //     return DataForSendToPrinterPos80.cancelUserDefinedCharacters(n);
+    // }
+    // @ReactMethod
+    // private byte[] setHorizontalmovementPosition(byte[] b){
+    //     return DataForSendToPrinterPos80.setHorizontalmovementPosition(b);
+    // }
+
+    // @ReactMethod
+    // private byte[] selectPrinter(int n){
+    //     return DataForSendToPrinterPos80.selectPrinter(n);
+    // }
+    // @ReactMethod
+    // private byte[] printAndFeed(int n){
+    //     return DataForSendToPrinterPos80.printAndFeed(n);
+    // }
+    // @ReactMethod
+    // private byte[] returnState(int n){
+    //     return DataForSendToPrinterPos80.returnState(n);
+    // }
+   
+  
+   
+
+    // @ReactMethod
+    // private byte[] printQRcode(int n, int errLevel, String code){
+    //     // 
+    //     return DataForSendToPrinterPos80.printQRcode(n,errLevel,code);
+    // }
+    // @ReactMethod
+    // private byte[] printBarcode(int m, int n, String content){
+    //     // 
+    //     return DataForSendToPrinterPos80.printBarcode(m,n,content);
+    // }
+    // @ReactMethod
+    // private byte[] printRasterBmp(int m, String bitmap,String bmpType, String alignType,int size,int w1){
+    //      final Bitmap bitmap1 =  BitmapProcess.compressBmpByYourWidth
+    //             (decodeBase64ToBitmap(bitmap),w1);
+    //         BitmapToByteData.AlignType align;
+    //         BitmapToByteData.BmpType bmpTypes;
+    //        if(alignType == "Right"){
+    //         align = BitmapToByteData.AlignType.Right;
+    //        }else if(alignType == "Left"){
+    //            align = BitmapToByteData.AlignType.Left;
+    //        }else{
+    //           align = BitmapToByteData.AlignType.Center;
+    //        }
+    //        if(bmpType == "Dithering"){
+    //         bmpTypes = BitmapToByteData.BmpType.Dithering;
+    //        }else {
+    //         bmpTypes = BitmapToByteData.BmpType.Threshold;
+    //        }
+
+    //     return DataForSendToPrinterPos80.printRasterBmp(0,bitmap1,bmpTypes,align,size);
+    // }
 
 }
