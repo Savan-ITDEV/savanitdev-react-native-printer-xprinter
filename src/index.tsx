@@ -56,7 +56,7 @@ export function printText(): Promise<boolean> {
 }
 
 export const printPOS = {
-  printText: function () {
+  printText: function (): Promise<boolean> {
     return AwesomeLibrary.printText();
   },
   initializeText: function () {

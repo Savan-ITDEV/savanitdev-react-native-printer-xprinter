@@ -99,45 +99,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         
     }
 
-    @ReactMethod
-    private void connectNet(String ip,Promise promise){
-       
-        if (ip!=null){
-            if (ISCONNECT) {
-                myBinder.DisconnectCurrentPort(new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-                      ISCONNECT = false;
-                      promise.resolve(Boolean.toString(ISCONNECT));
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                     ISCONNECT = true;
-                     promise.reject(Boolean.toString(ISCONNECT));
-                    }
-                });
-            } else {
-                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
-                    @Override
-                    public void OnSucceed() {
-                        ISCONNECT = true;
-                        promise.resolve(Boolean.toString(ISCONNECT));
-                    }
-
-                    @Override
-                    public void OnFailed() {
-                        ISCONNECT = false;
-                         promise.reject(Boolean.toString(ISCONNECT));
-                      
-                    }
-                });
-            }
-
-        }else {
-           
-        }
-    }
+   
 
 
     @ReactMethod
@@ -202,7 +164,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 public void OnFailed() {
                    promise.reject("","OnFailed print img");
                    
-                      disConnectNet();
+                  disConnectNet();
                    
                 }
             }, new ProcessData() {
@@ -283,7 +245,46 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         }
     }
 
-    
+     @ReactMethod
+    private void connectNet(String ip,Promise promise){
+       
+        if (ip!=null){
+            if (ISCONNECT) {
+                myBinder.DisconnectCurrentPort(new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                      ISCONNECT = false;
+                      connectNet(ip,promise);
+                    //   promise.resolve(Boolean.toString(ISCONNECT));
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                     ISCONNECT = true;
+                     promise.reject(Boolean.toString(ISCONNECT));
+                    }
+                });
+            } else {
+                myBinder.ConnectNetPort(ip, 9100, new TaskCallback() {
+                    @Override
+                    public void OnSucceed() {
+                        ISCONNECT = true;
+                        promise.resolve(Boolean.toString(ISCONNECT));
+                    }
+
+                    @Override
+                    public void OnFailed() {
+                        ISCONNECT = false;
+                         promise.reject(Boolean.toString(ISCONNECT));
+                      
+                    }
+                });
+            }
+
+        }else {
+           
+        }
+    }
     @ReactMethod
     private void printText(Promise promise){
         if (ISCONNECT){
@@ -291,15 +292,15 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 @Override
                 public void OnSucceed() {
                   
-                    disConnectNet();
+                    //  disConnectNet();
                     promise.resolve("Done");
                 }
 
                 @Override
                 public void OnFailed() {
                    
-                    promise.reject("error","printText fail!");
-                    disConnectNet();
+                   promise.reject("error","printText fail!");
+                //    disConnectNet();
 
                 }
             }, new ProcessData() {
@@ -309,7 +310,8 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
                 }
             });
         }else {
-            disConnectNet();
+              promise.reject("error","print ISCONNECT  false");
+            // disConnectNet();
         }
     }
 
