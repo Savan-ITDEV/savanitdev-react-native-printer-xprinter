@@ -12,6 +12,13 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -48,6 +55,43 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
   public String getName() {
     return NAME;
   }
+
+ @SuppressLint("MissingPermission")
+    @ReactMethod
+    private void findAvailableDevice(Promise promise){
+        try {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+            if (!bluetoothAdapter.isEnabled()) {
+
+                Set<BluetoothDevice> device = bluetoothAdapter.getBondedDevices();
+                Log.d("TAG", "findAvalibleDevice: "+device.size());
+            }else {
+
+                if (!bluetoothAdapter.isDiscovering()) {
+                    bluetoothAdapter.startDiscovery();
+                }
+
+                IntentFilter filterStart=new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                IntentFilter filterEnd=new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+                context.registerReceiver(BtReciever, filterStart);
+                context.registerReceiver(BtReciever, filterEnd);
+                Set<BluetoothDevice> device=bluetoothAdapter.getBondedDevices();
+
+                WritableMap result = Arguments.createMap();
+                for(Iterator<BluetoothDevice> it = device.iterator(); it.hasNext();){
+                    BluetoothDevice btd=it.next();
+                    Log.d("TAG", btd.getName()+'\n'+btd.getAddress());
+                    result.putString(btd.getName(), btd.getAddress());
+                }
+                promise.resolve(result);
+            }
+        }
+        catch (Exception exe) {
+            Log.d("TAG", "Exception--: " + exe);
+            promise.reject(exe);
+        }
+    }
 
   ServiceConnection mSerconnection= new ServiceConnection() {
         @Override

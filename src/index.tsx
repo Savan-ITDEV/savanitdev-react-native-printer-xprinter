@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from "react-native";
+import { NativeModules, Platform, PermissionsAndroid } from "react-native";
 
 const LINKING_ERROR =
   `The package 'react-native-awesome-library' doesn't seem to be linked. Make sure: \n\n` +
@@ -21,7 +21,35 @@ export function pingPinter(ip: string): Promise<boolean> {
   return AwesomeLibrary.pingPinter(ip);
 }
 export function onCreate() {
+  handleAndroidPermissions();
   return AwesomeLibrary.onCreate();
+}
+export function findAvailableDevice() {
+  const arr = [];
+  return AwesomeLibrary.findAvailableDevice()
+    .then(
+      (bluetoothDevices: {
+        [x: string]: any;
+        hasOwnProperty: (arg0: string) => any;
+      }) => {
+        for (const deviceName in bluetoothDevices) {
+          if (bluetoothDevices.hasOwnProperty(deviceName)) {
+            const deviceAddress = bluetoothDevices[deviceName];
+            arr.push({ name: deviceName, deviceAddress: deviceAddress });
+            // console.log(
+            //   `Device Name: ${deviceName}, Device Address: ${deviceAddress}`
+            // );
+            // Do something with the deviceName and deviceAddress
+          }
+        }
+        // console.log("Lists device found : ", arr);
+        return arr;
+      }
+    )
+    .catch((e: any) => {
+      console.log("Err", e);
+      return [];
+    });
 }
 export function connectNet(ip: string): Promise<boolean> {
   return AwesomeLibrary.connectNet(ip);
@@ -54,6 +82,50 @@ export function disConnectNet(): Promise<boolean> {
 export function printText(): Promise<boolean> {
   return AwesomeLibrary.printText();
 }
+const handleAndroidPermissions = () => {
+  try {
+    if (Platform.OS === "android" && Platform.Version >= 31) {
+      PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+      ]).then((result: any) => {
+        if (result) {
+          console.debug(
+            "[handleAndroidPermissions] User accepts runtime permissions android 12+"
+          );
+        } else {
+          console.error(
+            "[handleAndroidPermissions] User refuses runtime permissions android 12+"
+          );
+        }
+      });
+    } else if (Platform.OS === "android" && Platform.Version >= 23) {
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      ).then((checkResult: any) => {
+        if (checkResult) {
+          console.debug(
+            "[handleAndroidPermissions] runtime permission Android <12 already OK"
+          );
+        } else {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          ).then((requestResult: any) => {
+            if (requestResult) {
+              console.debug(
+                "[handleAndroidPermissions] User accepts runtime permission android <12"
+              );
+            } else {
+              console.error(
+                "[handleAndroidPermissions] User refuses runtime permission android <12"
+              );
+            }
+          });
+        }
+      });
+    }
+  } catch (error) {}
+};
 
 export const printPOS = {
   printText: function (): Promise<boolean> {
