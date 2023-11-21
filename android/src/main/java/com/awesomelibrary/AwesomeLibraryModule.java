@@ -1,29 +1,37 @@
 package com.awesomelibrary;
+
 import static android.content.Context.BIND_AUTO_CREATE;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
-
+import androidx.annotation.NonNull;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
+
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.TaskCallback;
@@ -35,7 +43,9 @@ import net.posprinter.utils.StringUtils;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 
 @ReactModule(name = AwesomeLibraryModule.NAME)
@@ -43,6 +53,8 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
   List<byte[]> setPrinter = new ArrayList<>();
   public static final String NAME = "AwesomeLibrary";
   public static IMyBinder myBinder;
+  private BluetoothAdapter bluetoothAdapter;
+  private DeviceReceiver BtReciever;
   public static boolean ISCONNECT=false;
  Context context;
   public AwesomeLibraryModule(ReactApplicationContext reactContext) {
@@ -56,7 +68,64 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
- @SuppressLint("MissingPermission")
+  ServiceConnection mSerconnection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            myBinder= (IMyBinder) service;
+            Log.e("myBinder","connect");
+            Toast toast = Toast.makeText(context, "connect", Toast.LENGTH_SHORT);
+            toast.show();
+           
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.e("myBinder","disconnect");
+            Toast toast = Toast.makeText(context, "disconnect", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    };
+
+    @ReactMethod
+    private void connectBT(String macAddress,Promise promise){
+        if (macAddress.equals(null)||macAddress.equals("")){
+            promise.reject("Error connect BTE");
+        }else {
+            myBinder.ConnectBtPort(macAddress, new TaskCallback() {
+                @Override
+                public void OnSucceed() {
+                    ISCONNECT=true;
+                    promise.resolve("connect BTE success");
+                }
+
+                @Override
+                public void OnFailed() {
+                    ISCONNECT=false;
+                    promise.reject("Error connect BTE");
+                }
+            } );
+        }
+    }
+     
+    @ReactMethod 
+    private void printRawData(String encode,Promise promise){
+        byte[] bytes = Base64.decode(encode, Base64.DEFAULT);
+         myBinder.Write(bytes, new TaskCallback() {
+            @Override
+            public void OnSucceed() {
+
+               promise.resolve("success print raw");
+            }
+
+            @Override
+            public void OnFailed() {
+
+              promise.reject("error print raw");
+            }
+        });
+    }
+    
+    @SuppressLint("MissingPermission")
     @ReactMethod
     private void findAvailableDevice(Promise promise){
         try {
@@ -93,27 +162,6 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         }
     }
 
-
-  ServiceConnection mSerconnection= new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            myBinder= (IMyBinder) service;
-            Log.e("myBinder","connect");
-            Toast toast = Toast.makeText(context, "connect", Toast.LENGTH_SHORT);
-            toast.show();
-           
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.e("myBinder","disconnect");
-            Toast toast = Toast.makeText(context, "disconnect", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    };
-
-
-
     @ReactMethod
     public void onCreate() {
       Intent intent =new Intent(context, PosprinterService.class);
@@ -144,23 +192,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         
     }
 
-       @ReactMethod 
-    private void printRawData(String encode,Promise promise){
-        byte[] bytes = Base64.decode(encode, Base64.DEFAULT);
-         myBinder.Write(bytes, new TaskCallback() {
-            @Override
-            public void OnSucceed() {
-
-               promise.resolve("success print raw");
-            }
-
-            @Override
-            public void OnFailed() {
-
-              promise.reject("error print raw");
-            }
-        });
-    }
+   
 
 
     @ReactMethod
