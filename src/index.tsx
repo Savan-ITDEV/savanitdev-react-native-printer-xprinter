@@ -55,7 +55,7 @@ export function findAvailableDevice() {
       const result = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
       );
-      console.error("error => ", e);
+      console.debug("error => ", e);
 
       if (result) {
         return [];
