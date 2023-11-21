@@ -1,4 +1,9 @@
-import { NativeModules, Platform, PermissionsAndroid } from "react-native";
+import {
+  NativeModules,
+  Platform,
+  PermissionsAndroid,
+  Alert,
+} from "react-native";
 
 const LINKING_ERROR =
   `The package 'react-native-awesome-library' doesn't seem to be linked. Make sure: \n\n` +
@@ -46,9 +51,21 @@ export function findAvailableDevice() {
         return arr;
       }
     )
-    .catch((e: any) => {
-      console.log("Err", e);
-      return [];
+    .catch(async (e: any) => {
+      const result = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
+      );
+      console.error("error => ", e);
+
+      if (result) {
+        return [];
+      } else {
+        Alert.alert(
+          "Warning!",
+          "please allow permission bluetooth for your app!"
+        );
+        return [];
+      }
     });
 }
 export function connectNet(ip: string): Promise<boolean> {
@@ -82,7 +99,10 @@ export function disConnectNet(): Promise<boolean> {
 export function printText(): Promise<boolean> {
   return AwesomeLibrary.printText();
 }
-const handleAndroidPermissions = () => {
+export function printRawData(encode: string): Promise<string> {
+  return AwesomeLibrary.printRawData(encode);
+}
+export const handleAndroidPermissions = () => {
   try {
     if (Platform.OS === "android" && Platform.Version >= 31) {
       PermissionsAndroid.requestMultiple([

@@ -93,6 +93,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         }
     }
 
+
   ServiceConnection mSerconnection= new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -143,7 +144,23 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         
     }
 
-   
+       @ReactMethod 
+    private void printRawData(String encode,Promise promise){
+        byte[] bytes = Base64.decode(encode, Base64.DEFAULT);
+         myBinder.Write(bytes, new TaskCallback() {
+            @Override
+            public void OnSucceed() {
+
+               promise.resolve("success print raw");
+            }
+
+            @Override
+            public void OnFailed() {
+
+              promise.reject("error print raw");
+            }
+        });
+    }
 
 
     @ReactMethod
