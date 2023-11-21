@@ -3,6 +3,7 @@ import {
   Platform,
   PermissionsAndroid,
   Alert,
+  Linking,
 } from "react-native";
 
 const LINKING_ERROR =
@@ -61,9 +62,23 @@ export function findAvailableDevice() {
         return [];
       } else {
         Alert.alert(
-          "Warning!",
-          "please allow permission bluetooth for your app!"
+          "แจ้งเตือนระบบ",
+          "หากต้องการเชื่อมต่อเครื่องพิมพ์แบบบลูทูธ กรุณาเปิดใช้บลูทูธ!!",
+          [
+            {
+              text: "ปิด",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+            {
+              text: "ไปหน้าตั้งค่า",
+              onPress: () => {
+                Linking.sendIntent("android.settings.BLUETOOTH_SETTINGS");
+              },
+            },
+          ]
         );
+
         return [];
       }
     });
