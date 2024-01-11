@@ -17,6 +17,6 @@ const androiManifestPlugin = (config: any) => {
 
 exports.default = (0, config_plugins_1.createRunOncePlugin)(
   androiManifestPlugin,
-  "react-native-awesome-library",
+  "react-native-awesome-library-printer",
   ""
 );
