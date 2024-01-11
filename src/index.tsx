@@ -101,12 +101,24 @@ export async function connectNetImg(
 ) {
   return await AwesomeLibrary.connectNetImg(ip, img, w1, w2);
 }
+export function connectBT(macAddress: string): Promise<string> {
+  return AwesomeLibrary.connectBT(macAddress);
+}
 export function printBitmap(
   img: string,
   w1: number,
   w2: number
 ): Promise<string> {
   return AwesomeLibrary.printBitmap(img, w1, w2);
+}
+
+export function printBitmapBLE(
+  img: string,
+  w1: number,
+  w2: number,
+  isBLE: number
+): Promise<string> {
+  return AwesomeLibrary.printBitmapBLE(img, w1, w2, isBLE);
 }
 export function disConnectNet(): Promise<boolean> {
   return AwesomeLibrary.disConnectNet();
