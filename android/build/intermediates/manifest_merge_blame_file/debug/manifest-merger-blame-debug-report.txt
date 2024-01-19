@@ -3,6 +3,6 @@
 3    package="com.awesomelibrary" >
 4
 5    <uses-sdk android:minSdkVersion="21" />
-5-->/Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-awesome-library-printer/android/src/main/AndroidManifestNew.xml
+5-->/Users/phuthiyen/Desktop/Devcourse/Expo/project/AppStock/node_modules/react-native-savanitdev-library-printer/android/src/main/AndroidManifestNew.xml
 6
 7</manifest>

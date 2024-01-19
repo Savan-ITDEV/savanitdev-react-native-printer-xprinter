@@ -7,7 +7,7 @@ import {
 } from "react-native";
 
 const LINKING_ERROR =
-  `The package 'react-native-awesome-library-printer' doesn't seem to be linked. Make sure: \n\n` +
+  `The package 'react-native-savanitdev-library-printer' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
   "- You rebuilt the app after installing the package\n" +
   "- You are not using Expo Go\n";
@@ -120,8 +120,8 @@ export function printBitmapBLE(
 ): Promise<string> {
   return AwesomeLibrary.printBitmapBLE(img, w1, w2, isBLE);
 }
-export function disConnectNet(): Promise<boolean> {
-  return AwesomeLibrary.disConnectNet();
+export async function disConnectNet(): Promise<string> {
+  return await AwesomeLibrary.disConnectNet();
 }
 export function printText(): Promise<boolean> {
   return AwesomeLibrary.printText();

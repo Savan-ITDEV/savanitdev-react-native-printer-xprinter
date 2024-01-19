@@ -73,7 +73,7 @@ public class AwesomeLibraryModule extends ReactContextBaseJavaModule {
         public void onServiceConnected(ComponentName name, IBinder service) {
             myBinder= (IMyBinder) service;
             Log.e("myBinder","connect");
-            Toast toast = Toast.makeText(context, "connect", Toast.LENGTH_SHORT);
+            // Toast toast = Toast.makeText(context, "connect", Toast.LENGTH_SHORT);
             toast.show();
            
         }
